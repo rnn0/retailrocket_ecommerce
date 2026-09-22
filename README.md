@@ -57,9 +57,6 @@ Resposta:
   "recommendations": ["item_45", "item_12", "item_88", "item_3", "item_71"]
 }
 ```
-
-Docs interativas: http://localhost:8000/docs
-
 ## 5. Testes
 
 ```bash
