@@ -12,20 +12,24 @@ from src.config import RANDOM_STATE
 
 
 class MemoryBasedCF:
-    """CF user-based: recomenda itens que usuários semelhantes consumiram."""
+    """CF user-based: recomenda itens que usuários semelhantes consumiram.
+
+    A similaridade é calculada sob demanda (linha a linha) em vez de pré-computar a
+    matriz completa usuário x usuário: para datasets grandes (ex: Retailrocket, ~160k
+    usuários), a matriz densa NxN não cabe em memória (~100+ GB). Calcular só a linha
+    do usuário consultado mantém o custo em O(n_usuários) por chamada, viável em tempo
+    real numa API."""
 
     def __init__(self, k_neighbors: int = 20):
         self.k_neighbors = k_neighbors
         self.matrix: csr_matrix | None = None
-        self.user_similarity: np.ndarray | None = None
 
     def fit(self, matrix: csr_matrix):
         self.matrix = matrix
-        self.user_similarity = cosine_similarity(matrix)
         return self
 
     def recommend(self, user_idx: int, n: int = 5) -> list[tuple[int, float]]:
-        sims = self.user_similarity[user_idx]
+        sims = cosine_similarity(self.matrix[user_idx], self.matrix).flatten()
         neighbor_idxs = np.argsort(-sims)[1 : self.k_neighbors + 1]  # exclui o próprio usuário
         neighbor_weights = sims[neighbor_idxs]
 

@@ -5,7 +5,7 @@ Rodar com: python -m src.pipeline
 import json
 import joblib
 
-from src.config import MODELS_DIR, N_CLUSTERS_DEFAULT, TOP_K_DEFAULT
+from src.config import MODELS_DIR, N_CLUSTERS_DEFAULT, TOP_K_DEFAULT, RANDOM_STATE
 from src.data.ingestion import load_events, data_quality_report
 from src.data.preprocessing import clean_events, build_interaction_matrix, temporal_train_test_split
 from src.features.build_features import build_user_features
@@ -74,8 +74,10 @@ def run():
     from sklearn.metrics import silhouette_score
 
     feature_cols = ["recency_days", "frequency", "n_unique_items", "engagement_score", "conversion_rate"]
+    X_scaled_final = scaler.transform(user_features[feature_cols].fillna(0).to_numpy())
+    sample_size = 10_000 if len(X_scaled_final) > 10_000 else None
     sil = silhouette_score(
-        scaler.transform(user_features[feature_cols].fillna(0).to_numpy()), clustered_users["cluster"]
+        X_scaled_final, clustered_users["cluster"], sample_size=sample_size, random_state=RANDOM_STATE
     )
     print(f"K-Means Silhouette Score final: {sil:.4f}")
 
