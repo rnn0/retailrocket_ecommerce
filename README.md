@@ -12,6 +12,10 @@ https://www.kaggle.com/datasets/retailrocket/ecommerce-dataset
 2. Coloque todos em `data/raw/`.
 3. Rode o pipeline (abaixo). Ele detecta os arquivos reais automaticamente.
 
+Enquanto isso, o projeto já roda de ponta a ponta com um **dataset sintético** no mesmo
+schema do Retailrocket, gerado por `src/data/make_sample_dataset.py`, para você validar
+tudo antes de trocar pelos dados reais.
+
 ## 2. Setup
 
 ```bash
@@ -57,6 +61,9 @@ Resposta:
   "recommendations": ["item_45", "item_12", "item_88", "item_3", "item_71"]
 }
 ```
+
+Docs interativas: http://localhost:8000/docs
+
 ## 5. Testes
 
 ```bash
