@@ -7,6 +7,7 @@ import joblib
 
 from src.config import MODELS_DIR, N_CLUSTERS_DEFAULT, TOP_K_DEFAULT, RANDOM_STATE
 from src.data.ingestion import load_events, data_quality_report
+from src.data.sanitization import sanitize_events, SanitizationReport
 from src.data.preprocessing import clean_events, build_interaction_matrix, temporal_train_test_split
 from src.features.build_features import build_user_features
 from src.models.collaborative_filtering import MemoryBasedCF, ALSCollaborativeFiltering
@@ -22,8 +23,12 @@ def run():
     print(json.dumps(report, indent=2, ensure_ascii=False))
 
     print("=" * 60)
-    print("2/6 - LIMPEZA E MATRIZ USUÁRIO-ITEM (Data Preparation)")
-    events = clean_events(events_raw)
+    print("2/6 - SANITIZAÇÃO, LIMPEZA E MATRIZ USUÁRIO-ITEM (Data Preparation)")
+    sanitization_report = SanitizationReport()
+    events_sanitized = sanitize_events(events_raw, report=sanitization_report)
+    print(sanitization_report.as_dataframe().to_string(index=False))
+
+    events = clean_events(events_sanitized)
     train_events, test_events = temporal_train_test_split(events, test_frac=0.2)
     interaction_matrix = build_interaction_matrix(train_events)
     print(f"Usuários: {len(interaction_matrix.user_to_idx)} | Itens: {len(interaction_matrix.item_to_idx)}")
@@ -83,6 +88,9 @@ def run():
 
     print("=" * 60)
     print("6/6 - SALVANDO ARTEFATOS (Deployment prep)")
+    from src.config import PROCESSED_DIR
+
+    sanitization_report.as_dataframe().to_csv(PROCESSED_DIR / "sanitization_report.csv", index=False)
     joblib.dump(interaction_matrix, MODELS_DIR / "interaction_matrix.pkl")
     joblib.dump(als_cf, MODELS_DIR / "als_model.pkl")
     joblib.dump(memory_cf, MODELS_DIR / "memory_cf_model.pkl")
