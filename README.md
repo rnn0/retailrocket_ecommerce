@@ -73,17 +73,28 @@ pytest -v
 ## 6. Estrutura do projeto
 
 ```
-src/data/            -> ingestão, geração de dados sintéticos, pré-processamento
+src/data/            -> ingestão, sanitização/tratamento e geração de dados sintéticos
 src/features/        -> feature engineering (RFM, matriz esparsa)
 src/models/          -> CF memory-based, CF via ALS, K-Means, estratégia híbrida
 src/evaluation/       -> métricas de ranking e de clustering
 src/pipeline.py       -> orquestrador ponta a ponta
+notebooks/            -> notebook explicativo do tratamento de dados (com EDA e evidências)
 api/                  -> API FastAPI (camadas: rotas -> service -> modelo)
 tests/                -> testes automatizados (pytest)
 docs/CRISP-DM.md      -> documentação do processo seguindo o CRISP-DM
 ```
 
-## 7. Metodologia (CRISP-DM)
+## 7. Notebook de tratamento de dados
+
+`notebooks/01_data_treatment_and_eda.ipynb` documenta, com evidências reais extraídas
+do Retailrocket (contagens, gráficos, exemplos), cada problema de qualidade encontrado
+e a decisão de tratamento tomada — duplicatas, usuários "bot", inconsistência de
+`transactionid`, natureza de changelog do `item_properties`, valores ofuscados e
+categorias órfãs — incluindo uma comparação antes/depois do impacto da sanitização na
+qualidade da segmentação (K-Means). O código de produção equivalente vive em
+`src/data/sanitization.py`.
+
+## 8. Metodologia (CRISP-DM)
 
 Ver `docs/CRISP-DM.md` para o detalhamento completo de cada fase (entendimento do
 negócio, dos dados, preparação, modelagem, avaliação e deployment).
