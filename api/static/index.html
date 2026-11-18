@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loja Demo — Recomendações personalizadas</title>
+<style>
+  :root {
+    --bg: #f5f6fa; --surface: #ffffff; --border: #e3e6ee; --text: #161a26; --muted: #5d6579;
+    --brand: #1e2761; --accent: #2f6fe4; --good: #1f9d6c; --warn: #b5690a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1220; --surface: #171b2e; --border: #2a2f48; --text: #eef0f7; --muted: #9aa3bd;
+            --brand: #cadcfc; --accent: #6ea8fe; --good: #7ee2b8; --warn: #ffb86b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 20px; color: var(--brand); }
+  header a { color: var(--accent); font-size: 14px; text-decoration: none; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 20px; }
+  .panel h2 { margin: 0 0 4px; font-size: 17px; }
+  .panel p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  input[type=text], input[type=number] { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 14px; }
+  button { padding: 9px 16px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button.chip { background: transparent; color: var(--accent); border: 1px solid var(--border); font-weight: 500; padding: 5px 12px; border-radius: 999px; }
+  button.chip:hover { border-color: var(--accent); }
+  .chips-label { font-size: 12px; color: var(--muted); margin: 10px 0 6px; }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .badge.als { color: var(--good); border-color: var(--good); }
+  .badge.fallback { color: var(--warn); border-color: var(--warn); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .thumb { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 34px; color: #fff; font-weight: 700; position: relative; }
+  .rank { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.35); font-size: 12px; padding: 2px 8px; border-radius: 999px; }
+  .info { padding: 12px 14px 14px; }
+  .info h3 { margin: 0 0 4px; font-size: 15px; }
+  .info .sub { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+  .price { font-weight: 700; font-size: 16px; }
+  .stock { font-size: 12px; margin-top: 4px; }
+  .stock.in { color: var(--good); } .stock.out { color: var(--warn); }
+  .error { color: #c44e52; font-size: 14px; }
+  pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow-x: auto; font-size: 12px; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 18px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🛒 Loja Demo · Recomendado para você</h1>
+  <a href="/docs" target="_blank">Documentação da API (Swagger) →</a>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Quem está navegando?</h2>
+    <p>Informe o ID de um visitante do Retailrocket. A vitrine chama <code>GET /recommendations/{user_id}</code> e exibe o resultado.</p>
+    <div class="row">
+      <input id="userId" type="text" placeholder="ID do usuário, ex.: 616529" size="22">
+      <input id="k" type="number" min="1" max="20" value="5" style="width:80px" title="Quantidade de produtos">
+      <button id="go">Ver recomendações</button>
+    </div>
+    <div class="chips-label">Usuários de exemplo</div>
+    <div class="row" id="chips"></div>
+  </section>
+
+  <section id="result"></section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+function esc(v) { return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function hue(n) { return (Number(n || 0) * 47) % 360; }
+
+function renderProducts(data) {
+  const strategyBadge = data.strategy === 'collaborative_filtering_als'
+    ? '<span class="badge als">Personalizado · Filtragem Colaborativa (ALS)</span>'
+    : '<span class="badge fallback">Usuário novo · Mais populares do segmento</span>';
+  const segment = data.segment ? `<span class="badge">Segmento: ${esc(data.segment.label)}</span>` : '<span class="badge">Usuário novo (sem segmento)</span>';
+  const cards = data.products.map(p => {
+    const price = p.price != null ? p.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—';
+    const stock = p.available == null ? '' : (p.available ? '<div class="stock in">Em estoque</div>' : '<div class="stock out">Indisponível</div>');
+    const cat = p.category_id != null ? `Categoria ${p.category_id}` : 'Sem categoria';
+    return `<div class="card">
+      <div class="thumb" style="background:hsl(${hue(p.category_id ?? p.item_id)},55%,45%)"><span class="rank">#${p.rank}</span>📦</div>
+      <div class="info"><h3>${esc(p.name)}</h3><div class="sub">${cat}</div><div class="price">${price}</div>${stock}</div>
+    </div>`;
+  }).join('');
+  $('result').innerHTML = `
+    <div class="panel">
+      <h2>Recomendações para o usuário ${esc(data.user_id)}</h2>
+      <div class="meta">${strategyBadge}${segment}</div>
+      <div class="grid">${cards}</div>
+      <details><summary>Ver resposta JSON da API</summary><pre>${esc(JSON.stringify(data, null, 2))}</pre></details>
+    </div>`;
+}
+
+async function load() {
+  const id = $('userId').value.trim();
+  if (!id) { $('result').innerHTML = '<div class="panel error">Informe um ID de usuário.</div>'; return; }
+  $('result').innerHTML = '<div class="panel">Buscando recomendações…</div>';
+  try {
+    const res = await fetch(`/recommendations/${encodeURIComponent(id)}?k=${encodeURIComponent($('k').value || 5)}`);
+    if (!res.ok) throw new Error((await res.json()).detail || res.statusText);
+    renderProducts(await res.json());
+  } catch (e) {
+    $('result').innerHTML = `<div class="panel error">Erro: ${esc(e.message)}</div>`;
+  }
+}
+
+function chip(label, id) {
+  const b = document.createElement('button');
+  b.className = 'chip'; b.textContent = label;
+  b.onclick = () => { $('userId').value = id; load(); };
+  $('chips').appendChild(b);
+}
+
+async function init() {
+  $('go').onclick = load;
+  $('userId').addEventListener('keydown', (e) => { if (e.key === 'Enter') load(); });
+  try {
+    const users = await (await fetch('/demo/users')).json();
+    users.com_historico.slice(0, 3).forEach(u => chip(`${u} · com histórico`, u));
+    users.pouco_historico.slice(0, 2).forEach(u => chip(`${u} · pouco histórico`, u));
+  } catch (e) { /* demo opcional */ }
+  chip('999999999 · usuário novo', '999999999');
+}
+init();
+</script>
+</body>
+</html>
