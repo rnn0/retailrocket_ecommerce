@@ -93,3 +93,26 @@ Implementado em `src/evaluation/metrics.py`:
   em qualquer ambiente.
 - Pipeline de CI (`.github/workflows/ci.yml`) treina o modelo e roda a suíte de testes
   a cada push, garantindo que mudanças no código não quebrem o sistema.
+
+---
+
+## 7. Resultados obtidos (dados reais, execução `20261118-151631`)
+
+**Qualidade dos dados** (`reports/sanitization_report.csv`): 2.756.101 eventos → 2.694.458 (−2,24%):
+460 duplicatas exatas e 61.183 eventos de 30 usuários "bot" (>1.000 eventos). `item_properties` é um
+changelog (mantido o último valor por item); apenas 3 das ~1.000 properties são interpretáveis
+(preço `790`, `available`, `categoryid`); valores ofuscados (`n15360.000` → 15,36) foram convertidos.
+
+**Dados de modelagem**: treino 994.053 / teste 248.514 eventos (split temporal 80/20); matriz 163.697 × 91.087,
+esparsidade 99,996%.
+
+**Modelagem**: ALS com BM25, 128 fatores, regularização 0,05 (melhor de 7 configurações em `reports/als_tuning.csv`).
+K-Means com log1p + StandardScaler, K=2 (silhouette 0,433).
+
+**Avaliação** (1.000 usuários por segmento; itens novos no período de teste; `reports/strategy_comparison.csv`):
+ALS atinge nDCG@5 0,0182 contra 0,0029 da popularidade (≈6×) para usuários com histórico.
+
+**Lições**: (1) o silhouette sozinho enganou — com bots e StandardScaler houve silhouette alto (0,496) mas um
+micro-cluster de 27 usuários; (2) o limiar 3 no híbrido jogava usuários de pouco histórico no fallback e derrubava o nDCG.
+
+**Limitações**: ver README (sem ratings explícitos, avaliação offline, K=2).

@@ -1,0 +1,8 @@
+step,rows_before,rows_after,rows_removed,pct_removed,note
+filtrar_eventos_fora_do_dominio,2756101,2756101,0,0.0,
+remover_nulos_essenciais,2756101,2756101,0,0.0,
+remover_duplicatas_exatas,2756101,2755641,460,0.0167,
+remover_inconsistencia_transactionid,2755641,2755641,0,0.0,0 linhas inconsistentes
+remover_usuarios_bot,2755641,2694458,61183,2.2203,30 usuários removidos (> 1000 eventos)
+filtrar_timestamps_fora_do_intervalo,2694458,2694458,0,0.0,
+TOTAL,2756101,2694458,61643,2.2366,pipeline de sanitização completo

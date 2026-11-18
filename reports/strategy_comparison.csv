@@ -1,0 +1,13 @@
+segmento,estrategia,precision@5,recall@5,ndcg@5,map@5,n_users_evaluated,catalog_coverage,latency_ms
+com_historico,popularidade_global,0.0008,0.0026,0.0029,0.0026,1000,0.0001,0.01
+com_historico,popularidade_por_cluster,0.0014,0.0036,0.0029,0.002,1000,0.0001,0.0
+com_historico,cf_memory_based,0.0074,0.0165,0.0141,0.01,1000,0.0443,16.14
+com_historico,cf_als,0.0094,0.0188,0.0182,0.0134,1000,0.0185,4.02
+com_historico,hibrido_limiar_3,0.0094,0.0188,0.0182,0.0134,1000,0.0185,4.06
+com_historico,hibrido_limiar_1,0.0094,0.0188,0.0182,0.0134,1000,0.0185,4.59
+pouco_historico,popularidade_global,0.001,0.0043,0.0044,0.0043,1000,0.0001,0.01
+pouco_historico,popularidade_por_cluster,0.0014,0.0051,0.0032,0.0023,1000,0.0001,0.0
+pouco_historico,cf_memory_based,0.009,0.0289,0.0211,0.0163,1000,0.0403,15.88
+pouco_historico,cf_als,0.0078,0.0264,0.0195,0.0154,1000,0.0198,4.22
+pouco_historico,hibrido_limiar_3,0.0014,0.0051,0.0032,0.0023,1000,0.0001,0.47
+pouco_historico,hibrido_limiar_1,0.0078,0.0264,0.0195,0.0154,1000,0.0198,4.09

@@ -1,0 +1,3 @@
+cluster,label,n_users,recency_days,frequency,n_unique_items,engagement_score,conversion_rate
+0,Baixo engajamento,129189,48.91,3.62,2.33,3.95,0.02
+1,Alto engajamento,34508,45.44,15.25,8.63,18.19,0.04

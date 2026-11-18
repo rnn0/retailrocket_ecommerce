@@ -1,0 +1,196 @@
+{
+  "version": "20261118-151631",
+  "trained_at": "2026-11-18T15:18:41",
+  "git_commit": "b878d9d",
+  "data": {
+    "raw_events": 2756101,
+    "events_after_sanitization": 2694458,
+    "train_events": 994053,
+    "test_events": 248514,
+    "n_users": 163697,
+    "n_items": 91087,
+    "matrix_sparsity_pct": 99.996
+  },
+  "params": {
+    "als": {
+      "factors": 128,
+      "regularization": 0.05,
+      "iterations": 15,
+      "weighting": "bm25"
+    },
+    "memory_cf": {
+      "k_neighbors": 20
+    },
+    "k_means_k": 2,
+    "top_k": 5
+  },
+  "clustering": {
+    "silhouette_final": 0.4331,
+    "silhouette_by_k": {
+      "2": 0.4331,
+      "3": 0.3135,
+      "4": 0.3168,
+      "5": 0.3442,
+      "6": 0.2886,
+      "7": 0.2553,
+      "8": 0.2358
+    },
+    "cluster_labels": {
+      "1": "Alto engajamento",
+      "0": "Baixo engajamento"
+    },
+    "cluster_sizes": {
+      "0": 129189,
+      "1": 34508
+    }
+  },
+  "evaluation": [
+    {
+      "segmento": "com_historico",
+      "estrategia": "popularidade_global",
+      "precision@5": 0.0008,
+      "recall@5": 0.0026,
+      "ndcg@5": 0.0029,
+      "map@5": 0.0026,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0001,
+      "latency_ms": 0.01
+    },
+    {
+      "segmento": "com_historico",
+      "estrategia": "popularidade_por_cluster",
+      "precision@5": 0.0014,
+      "recall@5": 0.0036,
+      "ndcg@5": 0.0029,
+      "map@5": 0.002,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0001,
+      "latency_ms": 0.0
+    },
+    {
+      "segmento": "com_historico",
+      "estrategia": "cf_memory_based",
+      "precision@5": 0.0074,
+      "recall@5": 0.0165,
+      "ndcg@5": 0.0141,
+      "map@5": 0.01,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0443,
+      "latency_ms": 16.14
+    },
+    {
+      "segmento": "com_historico",
+      "estrategia": "cf_als",
+      "precision@5": 0.0094,
+      "recall@5": 0.0188,
+      "ndcg@5": 0.0182,
+      "map@5": 0.0134,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0185,
+      "latency_ms": 4.02
+    },
+    {
+      "segmento": "com_historico",
+      "estrategia": "hibrido_limiar_3",
+      "precision@5": 0.0094,
+      "recall@5": 0.0188,
+      "ndcg@5": 0.0182,
+      "map@5": 0.0134,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0185,
+      "latency_ms": 4.06
+    },
+    {
+      "segmento": "com_historico",
+      "estrategia": "hibrido_limiar_1",
+      "precision@5": 0.0094,
+      "recall@5": 0.0188,
+      "ndcg@5": 0.0182,
+      "map@5": 0.0134,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0185,
+      "latency_ms": 4.59
+    },
+    {
+      "segmento": "pouco_historico",
+      "estrategia": "popularidade_global",
+      "precision@5": 0.001,
+      "recall@5": 0.0043,
+      "ndcg@5": 0.0044,
+      "map@5": 0.0043,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0001,
+      "latency_ms": 0.01
+    },
+    {
+      "segmento": "pouco_historico",
+      "estrategia": "popularidade_por_cluster",
+      "precision@5": 0.0014,
+      "recall@5": 0.0051,
+      "ndcg@5": 0.0032,
+      "map@5": 0.0023,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0001,
+      "latency_ms": 0.0
+    },
+    {
+      "segmento": "pouco_historico",
+      "estrategia": "cf_memory_based",
+      "precision@5": 0.009,
+      "recall@5": 0.0289,
+      "ndcg@5": 0.0211,
+      "map@5": 0.0163,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0403,
+      "latency_ms": 15.88
+    },
+    {
+      "segmento": "pouco_historico",
+      "estrategia": "cf_als",
+      "precision@5": 0.0078,
+      "recall@5": 0.0264,
+      "ndcg@5": 0.0195,
+      "map@5": 0.0154,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0198,
+      "latency_ms": 4.22
+    },
+    {
+      "segmento": "pouco_historico",
+      "estrategia": "hibrido_limiar_3",
+      "precision@5": 0.0014,
+      "recall@5": 0.0051,
+      "ndcg@5": 0.0032,
+      "map@5": 0.0023,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0001,
+      "latency_ms": 0.47
+    },
+    {
+      "segmento": "pouco_historico",
+      "estrategia": "hibrido_limiar_1",
+      "precision@5": 0.0078,
+      "recall@5": 0.0264,
+      "ndcg@5": 0.0195,
+      "map@5": 0.0154,
+      "n_users_evaluated": 1000,
+      "catalog_coverage": 0.0198,
+      "latency_ms": 4.09
+    }
+  ],
+  "demo_users": {
+    "com_historico": [
+      616529,
+      137360,
+      918389,
+      1088970
+    ],
+    "pouco_historico": [
+      982059,
+      283588,
+      132773,
+      745867
+    ]
+  },
+  "pipeline_seconds": 129.7
+}

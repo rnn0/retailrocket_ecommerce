@@ -1,0 +1,19 @@
+{
+  "n_rows": 2756101,
+  "n_unique_users": 1407580,
+  "n_unique_items": 235061,
+  "n_nulls_per_col": {
+    "timestamp": 0,
+    "visitorid": 0,
+    "event": 0,
+    "itemid": 0,
+    "transactionid": 2733644
+  },
+  "n_duplicates": 460,
+  "event_distribution": {
+    "view": 2664312,
+    "addtocart": 69332,
+    "transaction": 22457
+  },
+  "sparsity_pct": 99.9994
+}
