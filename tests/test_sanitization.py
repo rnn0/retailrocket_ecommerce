@@ -3,12 +3,12 @@ import pandas as pd
 import pytest
 
 from src.data.sanitization import (
+    BOT_EVENT_THRESHOLD,
+    SanitizationReport,
+    parse_item_property_value,
+    sanitize_category_tree,
     sanitize_events,
     sanitize_item_properties,
-    sanitize_category_tree,
-    parse_item_property_value,
-    SanitizationReport,
-    BOT_EVENT_THRESHOLD,
 )
 
 
@@ -98,3 +98,19 @@ def test_sanitize_category_tree_removes_orphan_parents():
     result = sanitize_category_tree(tree)
     assert 3 not in result["categoryid"].values
     assert {1, 2} <= set(result["categoryid"].values)
+
+
+def test_build_item_catalog_merges_parent_category():
+    import pandas as pd
+
+    from src.data.sanitization import build_item_catalog
+
+    props = pd.DataFrame({
+        "timestamp": [1, 1, 1], "itemid": [5, 5, 5],
+        "property": ["790", "available", "categoryid"], "value": ["n15360.000", "1", "7"],
+    })
+    tree = pd.DataFrame({"categoryid": [7, 1], "parentid": [1, None]})
+    cat = build_item_catalog(props, tree)
+    row = cat.iloc[0]
+    assert row["itemid"] == 5
+    assert row["parent_categoryid"] == 1

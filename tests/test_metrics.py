@@ -1,4 +1,4 @@
-from src.evaluation.metrics import precision_at_k, recall_at_k, ndcg_at_k
+from src.evaluation.metrics import ndcg_at_k, precision_at_k, recall_at_k
 
 
 def test_precision_at_k_perfect_match():
@@ -26,3 +26,13 @@ def test_ndcg_at_k_order_matters():
 
 def test_ndcg_at_k_no_relevant_found():
     assert ndcg_at_k(["x", "y"], {"a"}, k=2) == 0.0
+
+
+def test_evaluate_recommender_and_map():
+    from src.evaluation.metrics import average_precision_at_k, evaluate_recommender
+
+    assert average_precision_at_k([1, 2, 3], {1, 3}, 3) > 0
+    res = evaluate_recommender(lambda u: [1, 2], {10: {1}, 11: {5}}, k=2, n_catalog_items=10)
+    assert res["n_users_evaluated"] == 2
+    assert 0 < res["precision@2"] <= 0.5
+    assert res["catalog_coverage"] == 0.2
