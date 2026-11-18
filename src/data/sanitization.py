@@ -21,7 +21,6 @@ exploratória (ver notebooks/01_data_treatment_and_eda.ipynb):
 """
 from dataclasses import dataclass, field
 
-import numpy as np
 import pandas as pd
 
 from src.config import EVENT_WEIGHTS
@@ -175,3 +174,13 @@ def sanitize_category_tree(category_tree: pd.DataFrame) -> pd.DataFrame:
     valid_ids = set(df["categoryid"])
     orphan_mask = df["parentid"].notna() & ~df["parentid"].isin(valid_ids)
     return df[~orphan_mask].reset_index(drop=True)
+
+
+def build_item_catalog(item_properties: pd.DataFrame, category_tree: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Catálogo de produtos (uma linha por item) usado pela API para detalhar as
+    recomendações: preço, disponibilidade, categoria e categoria-pai."""
+    items = sanitize_item_properties(item_properties)
+    if category_tree is not None and not category_tree.empty and "categoryid" in items.columns:
+        tree = sanitize_category_tree(category_tree).rename(columns={"parentid": "parent_categoryid"})
+        items = items.merge(tree, on="categoryid", how="left")
+    return items

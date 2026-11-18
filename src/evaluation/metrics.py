@@ -3,6 +3,7 @@ Fase CRISP-DM: Evaluation.
 Métricas de ranking (para os recomendadores) e de clustering (para o K-Means).
 """
 import numpy as np
+import pandas as pd
 
 
 def precision_at_k(recommended: list, relevant: set, k: int) -> float:
@@ -29,25 +30,52 @@ def ndcg_at_k(recommended: list, relevant: set, k: int) -> float:
     return dcg / idcg if idcg > 0 else 0.0
 
 
-def evaluate_recommender(recommend_fn, test_events, k: int = 5) -> dict:
-    """
-    recommend_fn: callable(user_id) -> list[item_id]
-    test_events: DataFrame com colunas visitorid, itemid (eventos "held-out" do split temporal)
-    """
-    relevant_by_user = test_events.groupby("visitorid")["itemid"].apply(set).to_dict()
+def average_precision_at_k(recommended: list, relevant: set, k: int) -> float:
+    """AP@K: média da precisão nas posições em que houve acerto (premia acertar cedo).
+    O MAP é a média do AP@K sobre os usuários."""
+    if not relevant:
+        return 0.0
+    hits, score = 0, 0.0
+    for i, item in enumerate(recommended[:k]):
+        if item in relevant:
+            hits += 1
+            score += hits / (i + 1)
+    return score / min(len(relevant), k)
 
-    precisions, recalls, ndcgs = [], [], []
-    for user_id, relevant_items in relevant_by_user.items():
+
+def evaluate_recommender(recommend_fn, relevant, k: int = 5, n_catalog_items: int | None = None) -> dict:
+    """
+    recommend_fn: callable(user_id) -> list[item_id] (ou None se não houver recomendação)
+    relevant: dict {user_id: set(item_id)} OU DataFrame com colunas visitorid/itemid
+              (itens "held-out" do split temporal)
+    n_catalog_items: se informado, calcula a cobertura de catálogo (fração dos itens
+              que apareceram em alguma recomendação) -> mede diversidade.
+    """
+    if isinstance(relevant, pd.DataFrame):
+        relevant = relevant.groupby("visitorid")["itemid"].apply(set).to_dict()
+
+    precisions, recalls, ndcgs, aps = [], [], [], []
+    recommended_items = set()
+    for user_id, relevant_items in relevant.items():
         recommended = recommend_fn(user_id)
         if recommended is None:
             continue
+        recommended_items.update(recommended[:k])
         precisions.append(precision_at_k(recommended, relevant_items, k))
         recalls.append(recall_at_k(recommended, relevant_items, k))
         ndcgs.append(ndcg_at_k(recommended, relevant_items, k))
+        aps.append(average_precision_at_k(recommended, relevant_items, k))
 
-    return {
-        f"precision@{k}": round(float(np.mean(precisions)), 4) if precisions else 0.0,
-        f"recall@{k}": round(float(np.mean(recalls)), 4) if recalls else 0.0,
-        f"ndcg@{k}": round(float(np.mean(ndcgs)), 4) if ndcgs else 0.0,
+    def _mean(values):
+        return round(float(np.mean(values)), 4) if values else 0.0
+
+    result = {
+        f"precision@{k}": _mean(precisions),
+        f"recall@{k}": _mean(recalls),
+        f"ndcg@{k}": _mean(ndcgs),
+        f"map@{k}": _mean(aps),
         "n_users_evaluated": len(precisions),
     }
+    if n_catalog_items:
+        result["catalog_coverage"] = round(len(recommended_items) / n_catalog_items, 4)
+    return result

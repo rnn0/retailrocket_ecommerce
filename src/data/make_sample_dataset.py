@@ -9,7 +9,8 @@ Schema real do Retailrocket (Kaggle):
 """
 import numpy as np
 import pandas as pd
-from src.config import RAW_DIR, RANDOM_STATE
+
+from src.config import RANDOM_STATE, RAW_DIR
 
 
 def generate_sample_events(
@@ -55,13 +56,18 @@ def generate_sample_events(
 
 
 def generate_sample_item_properties(n_items: int = 300, seed: int = RANDOM_STATE) -> pd.DataFrame:
+    """Mesmo formato do Retailrocket: preço na property "790" com prefixo "n" e escala x1000,
+    disponibilidade em "available" e categoria em "categoryid"."""
     rng = np.random.default_rng(seed)
     categories = rng.integers(1, 25, size=n_items)
-    prices = rng.integers(500, 500000, size=n_items)  # em "centavos", como no Retailrocket
+    prices = rng.uniform(5, 500, size=n_items)
+    available = rng.integers(0, 2, size=n_items)
     rows = []
-    for item_id, cat, price in zip(range(1, n_items + 1), categories, prices):
-        rows.append({"itemid": item_id, "property": "categoryid", "value": str(cat), "timestamp": 1_600_000_000_000})
-        rows.append({"itemid": item_id, "property": "price", "value": str(price), "timestamp": 1_600_000_000_000})
+    ts = 1_600_000_000_000
+    for item_id, cat, price, avail in zip(range(1, n_items + 1), categories, prices, available):
+        rows.append({"timestamp": ts, "itemid": item_id, "property": "categoryid", "value": str(cat)})
+        rows.append({"timestamp": ts, "itemid": item_id, "property": "790", "value": f"n{price * 1000:.3f}"})
+        rows.append({"timestamp": ts, "itemid": item_id, "property": "available", "value": str(avail)})
     return pd.DataFrame(rows)
 
 

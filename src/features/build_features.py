@@ -2,7 +2,9 @@
 Fase CRISP-DM: Data Preparation (feature engineering para clustering).
 Constrói features agregadas por usuário (estilo RFM + comportamento) para o K-Means.
 """
+import numpy as np
 import pandas as pd
+
 from src.config import EVENT_WEIGHTS
 
 
@@ -27,7 +29,7 @@ def build_user_features(events: pd.DataFrame) -> pd.DataFrame:
     for col in ("view", "addtocart", "transaction"):
         if col not in event_counts.columns:
             event_counts[col] = 0
-    conversion_rate = (event_counts["transaction"] / event_counts["view"].replace(0, pd.NA)).fillna(0).rename(
+    conversion_rate = (event_counts["transaction"] / event_counts["view"].replace(0, np.nan)).fillna(0).rename(
         "conversion_rate"
     )
 

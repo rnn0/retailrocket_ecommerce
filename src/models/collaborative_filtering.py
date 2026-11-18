@@ -45,11 +45,15 @@ class MemoryBasedCF:
 
 
 class ALSCollaborativeFiltering:
-    """CF model-based via Alternating Least Squares (dados implícitos)."""
+    """CF model-based via Alternating Least Squares (dados implícitos).
 
-    def __init__(self, factors: int = 32, regularization: float = 0.05, iterations: int = 15):
+    weighting: None (pesos de evento como confiança) ou "bm25" (atenua itens muito populares e
+    usuários muito ativos; costuma ajudar bastante em dados implícitos esparsos)."""
+
+    def __init__(self, factors: int = 32, regularization: float = 0.05, iterations: int = 15, weighting: str | None = None):
         from implicit.als import AlternatingLeastSquares
 
+        self.weighting = weighting
         self.model = AlternatingLeastSquares(
             factors=factors,
             regularization=regularization,
@@ -59,9 +63,14 @@ class ALSCollaborativeFiltering:
         self._fitted_matrix: csr_matrix | None = None
 
     def fit(self, matrix: csr_matrix):
+        m = matrix.tocsr().astype(np.float32)
+        if self.weighting == "bm25":
+            from implicit.nearest_neighbours import bm25_weight
+
+            m = bm25_weight(m, K1=100, B=0.8).tocsr()
         # implicit espera matriz (usuários x itens) de confiança/peso
-        self._fitted_matrix = matrix.tocsr()
-        self.model.fit(self._fitted_matrix)
+        self._fitted_matrix = m
+        self.model.fit(self._fitted_matrix, show_progress=False)
         return self
 
     def recommend(self, user_idx: int, n: int = 5) -> list[tuple[int, float]]:
