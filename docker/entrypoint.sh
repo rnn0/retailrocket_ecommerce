@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 # Treina o modelo na primeira subida (precisa de data/raw/*.csv montado em /app/data/raw).
-if [ ! -f models/metadata.json ]; then
+if [ ! -f models/als_model.pkl ]; then
   echo "[entrypoint] Modelos não encontrados: executando o pipeline de treino..."
   python -m src.pipeline
 fi
