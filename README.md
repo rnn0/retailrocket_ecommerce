@@ -82,8 +82,8 @@ Outros endpoints: `/health`, `/model` (versão, parâmetros, métricas), `/demo/
 | # | Critério | Evidência no repositório |
 |---|---|---|
 | 1 | Problema e CRISP-DM | `docs/CRISP-DM.md` |
-| 2 | Aquisição, qualidade e preparação | `src/data/` (ingestão, sanitização), `notebooks/01_*`, `reports/sanitization_report.csv` |
-| 3 | Mineração e modelagem | `src/models/`, `src/experiments/tune_als.py`, `notebooks/02_*` |
+| 2 | Aquisição, qualidade e preparação | `src/data/` (ingestão, sanitização), `notebooks/Projeto_Recomendacao_Ecommerce_Completo.ipynb`, `reports/sanitization_report.csv` |
+| 3 | Mineração e modelagem | `src/models/`, `src/experiments/tune_als.py`, `notebooks/Projeto_Recomendacao_Ecommerce_Completo.ipynb` |
 | 4 | Avaliação e interpretação | `src/evaluation/`, `reports/strategy_comparison.csv`, `reports/figures/` |
 | 5 | Engenharia do pipeline | `src/pipeline.py` (etapas, logs, CLI, versionamento em `models/metadata.json` e `registry.jsonl`) |
 | 6 | Arquitetura e software | `api/` (rotas → serviço → modelo), `docs/ARCHITECTURE.md` |
