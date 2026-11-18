@@ -96,3 +96,8 @@ Outros endpoints: `/health`, `/model` (versão, parâmetros, métricas), `/demo/
 - K-Means resultou em apenas 2 segmentos (melhor silhouette); K maiores têm silhouette menor.
 - Usuário completamente novo recebe os itens mais populares do maior segmento.
 - Nomes de produto são "Produto {id}" (o dataset é anonimizado).
+
+## Execução rápida (qualquer PC, sem dados e sem treino)
+Com o pacote que inclui a pasta `models/` já treinada, basta ter o **Python 3.12** e dar duplo clique em
+`run_demo.bat` (Windows) ou rodar `./run_demo.sh`. O script cria o ambiente, instala as dependências e abre
+`http://localhost:8000/`. Sem a pasta `models/`, rode antes `python -m src.pipeline` (precisa dos CSVs em `data/raw/`).
