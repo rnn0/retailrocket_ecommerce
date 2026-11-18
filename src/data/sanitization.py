@@ -3,7 +3,7 @@ Fase CRISP-DM: Data Preparation — Sanitização e tratamento de dados.
 
 Este módulo concentra as regras de qualidade aplicadas aos dados brutos do
 Retailrocket, cada uma justificada por um problema real encontrado na análise
-exploratória (ver notebooks/01_data_treatment_and_eda.ipynb):
+exploratória (ver notebooks/Projeto_Recomendacao_Ecommerce_Completo.ipynb):
 
   1. Eventos duplicados (linhas exatamente repetidas).
   2. Usuários com volume de eventos incompatível com comportamento humano
